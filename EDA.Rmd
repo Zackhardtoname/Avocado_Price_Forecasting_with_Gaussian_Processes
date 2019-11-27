@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(GauPro)
 ```
 
 ```{r}
@@ -19,15 +20,28 @@ No problem loading the dataset.
 
 # filtering
 ```{r}
-total_us <- original %>% 
+total_US <- original %>% 
   filter(region == "TotalUS")
 ```
 # plotting
 ```{r}
-total_us %>% ggplot() +
+total_US %>% ggplot() +
   geom_point(aes(Date, AveragePrice, color = type), alpha=.5)
-
 ```
 
+```{r}
+total_US_organic <- total_US %>% 
+  filter(type == "organic")
+```
+
+# fitting
+```{r}
+n <- nrow(total_US_organic)
+x <- matrix(seq(0,1,length.out = n), ncol=1)
+y <- total_US_organic$AveragePrice
+gp <- GauPro::GauPro(X=x, Z=y)
+
+curve(gp$pred(x));points(x,y)
+curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T);curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
 ```
 
