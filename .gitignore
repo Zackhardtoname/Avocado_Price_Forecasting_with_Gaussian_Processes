@@ -1,0 +1,13 @@
+# miscellaneous
+*.idea
+
+# Python
+venv
+.ipynb_checkpoints/
+__pycache__
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
