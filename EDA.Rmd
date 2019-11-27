@@ -1,0 +1,33 @@
+---
+title: "EDA"
+author: "Zack Light"
+date: "11/26/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+original <- read.csv('data/original.csv')
+  
+problems(original)
+```
+No problem loading the dataset.
+
+# filtering
+```{r}
+total_us <- original %>% 
+  filter(region == "TotalUS")
+```
+# plotting
+```{r}
+total_us %>% ggplot() +
+  geom_point(aes(Date, AveragePrice, color = type), alpha=.5)
+
+```
+
+```
+
