@@ -26,7 +26,7 @@ total_US <- original %>%
 # plotting
 ```{r}
 total_US %>% ggplot() +
-  geom_point(aes(Date, AveragePrice, color = type), alpha=.5)
+  geom_point(aes(Date, AveragePrice, color = type), alpha=.5) 
 ```
 
 ```{r}
@@ -34,14 +34,27 @@ total_US_organic <- total_US %>%
   filter(type == "organic")
 ```
 
-# fitting
+# fitting organic
 ```{r}
 n <- nrow(total_US_organic)
 x <- matrix(seq(0,1,length.out = n), ncol=1)
 y <- total_US_organic$AveragePrice
 gp <- GauPro::GauPro(X=x, Z=y)
 
-curve(gp$pred(x));points(x,y)
-curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T);curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
+curve(gp$pred(x))
+points(x,y)
+curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T)
+curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
+
+plot(predict(gp, seq(1,2,length.out = 100)))
 ```
 
+# GauPro_kernel$new(0), GauPro_kernel_beta$new(0),
+```{r}
+kernels <- c( Exponential$new(0), Matern32$new(0), Matern52$new(0),  Gaussian$new(0), Periodic$new(p=1, alpha=1), RatQuad$new(beta=0, alpha=0))
+
+for (kernel in kernels) {
+  gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kernel, parallel=TRUE)
+  plot(gpk)
+} 
+```
