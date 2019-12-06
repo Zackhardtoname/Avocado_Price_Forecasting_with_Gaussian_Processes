@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import glob
 
 
 DATA_DIR = os.path.join('.', 'data')
