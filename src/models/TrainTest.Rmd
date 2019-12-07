@@ -1,0 +1,68 @@
+---
+title: "TrainTest"
+author: "braceal"
+date: "12/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "EDA"
+author: "Zack Light"
+date: "11/26/2019"
+output: html_document
+---
+
+Check for missing packages
+```{r}
+list.of.packages <- c("tidyverse", "GauPro", "glue")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GauPro)
+library(glue)
+
+source("../utils/helpers.R")
+```
+
+```{r}
+train <- get_data("conventional", "TotalUS", dataset_types=c("train"))
+test <- get_data("conventional", "TotalUS", dataset_types=c("test"))
+```
+No problem loading the dataset.
+
+
+```{r}
+n <- nrow(train)
+x <- matrix(seq(0,1,length.out = n), ncol=1)
+y <- train$AveragePrice
+gp <- GauPro::GauPro(X=x, Z=y)
+
+curve(gp$pred(x))
+
+points(x,y)
+
+curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T)
+curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
+
+
+plot(predict(gp, seq(1,2,length.out = 100)))
+
+```
+
+# GauPro_kernel$new(0), GauPro_kernel_beta$new(0),
+```{r}
+kernels <- c( Exponential$new(0), Matern32$new(0), Matern52$new(0),  Gaussian$new(0), Periodic$new(p=1, alpha=1), RatQuad$new(beta=0, alpha=0))
+
+for (kernel in kernels) {
+  gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kernel, parallel=TRUE)
+  plot(gpk)
+} 
+```
