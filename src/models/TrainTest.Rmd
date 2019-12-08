@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(MLmetrics)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -33,36 +34,68 @@ source("../utils/helpers.R")
 ```
 
 ```{r}
-train <- get_data("conventional", "TotalUS", dataset_types=c("train"))
-test <- get_data("conventional", "TotalUS", dataset_types=c("test"))
+# train <- get_data("conventional", "TotalUS", dataset_types=c("train"))
+# test <- get_data("conventional", "TotalUS", dataset_types=c("test"))
+
+train <- read.csv('../../data/organic/train/TotalUS.csv')
+test <- read.csv('../../data/organic/test/TotalUS.csv')
 ```
 No problem loading the dataset.
 
 
 ```{r}
-n <- nrow(train)
-x <- matrix(seq(0,1,length.out = n), ncol=1)
+train_size <- nrow(train)
+test_size <- nrow(test)
+x <- matrix(seq(1, train_size), ncol=1)
 y <- train$AveragePrice
 gp <- GauPro::GauPro(X=x, Z=y)
 
-curve(gp$pred(x))
-
-points(x,y)
-
-curve(gp$pred(x)+2*gp$pred(x,T)$se,col=2,add=T)
-curve(gp$pred(x)-2*gp$pred(x,T)$se,col=2,add=T)
-
-
-plot(predict(gp, seq(1,2,length.out = 100)))
-
+x_ticks <- seq(train_size+1, train_size+test_size)
+pred <- predict(gp, matrix(x_ticks, ncol=1))
+plot(x_ticks, type ='p', test$AveragePrice, xlab = test$Date, ylab = 'price', main = 'True vs Predicted Prices', col ="red")
+points(x_ticks, pred)
+MAE(pred, test$AveragePrice)
 ```
 
 # GauPro_kernel$new(0), GauPro_kernel_beta$new(0),
 ```{r}
-kernels <- c( Exponential$new(0), Matern32$new(0), Matern52$new(0),  Gaussian$new(0), Periodic$new(p=1, alpha=1), RatQuad$new(beta=0, alpha=0))
+kernels <- c( Exponential$new(1), Matern32$new(1), Matern52$new(1),  Gaussian$new(1), Periodic$new(p=1, alpha=1), RatQuad$new(beta=1, alpha=1))
+
+hyperparams <- rep(x=seq(0,2, length.out=10),7)
+
+x_ticks <- seq(train_size+1, train_size+test_size)
 
 for (kernel in kernels) {
-  gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kernel, parallel=TRUE)
-  plot(gpk)
-} 
+    gpk <- GauPro_kernel_model$new(matrix(x, ncol=1), y, kernel=kernel, parallel=TRUE)
+    
+    pred <- predict(gpk, matrix(x_ticks, ncol=1))
+    plot(x_ticks, type ='p', test$AveragePrice, xlab = test$Date, ylab = 'price', main = 'True vs Predicted Prices', col ="red")
+
+    points(x_ticks, pred)
+    message(MSE(pred, test$AveragePrice))
+}
 ```
+
+```{r}
+kernel <- Periodic$new(p=0.8, alpha=1.5)
+
+# 1.5, 0
+
+# hyperparams <- rep(x=seq(0,2, length.out=10),7)
+
+train_size <- nrow(train)
+test_size <- nrow(test)
+x <- matrix(seq(1, train_size), ncol=1)
+y <- train$AveragePrice
+
+gpk <- GauPro_kernel_model$new(x, y, kernel=kernel, parallel=TRUE)
+
+x_ticks <- seq(train_size+1, train_size+test_size)
+    
+pred <- predict(gpk, matrix(x_ticks, ncol=1))
+plot(x_ticks, type ='p', test$AveragePrice, xlab = test$Date, ylab = 'price', main = 'True vs Predicted Prices', col ="red")
+points(x_ticks, pred)
+message(MSE(pred, test$AveragePrice))
+
+```
+
