@@ -81,29 +81,15 @@ y_gpr, y_std = gpr.predict(np.array(base_range).reshape(-1, 1), return_std=True)
 # Plot results
 y_gpr = y_gpr.flatten()
 
-plt.figure(figsize=(10, 5))
-plt.scatter(X, y, c='k', label='old data')
-plt.scatter(base_range, ground_truth[:len(base_range)], c='r', label='new data')
-plt.plot(base_range, y_gpr, color='darkorange', lw=2,
-         label='GPR (%s)' % gpr.kernel_)
-z = 1.96
-CI_lower_bound = y_gpr - z * y_std
-CI_higher_bound = y_gpr + z * y_std
-
-plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
-plt.xlabel('data')
-plt.ylabel('target')
-plt.title('GPR')
-plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
-plt.show()
-
 test_size = len(y_gpr)
 ground_truth = ground_truth[:test_size]
 
 rmse = np.linalg.norm(y_gpr - ground_truth) / np.sqrt(test_size)
 r_2 = sklearn.metrics.r2_score(y_gpr, ground_truth)
 r = scipy.stats.pearsonr(y_gpr, ground_truth)
-
+z = 1.96
+CI_lower_bound = y_gpr - z * y_std
+CI_higher_bound = y_gpr + z * y_std
 out_of_CI_ctn = 0
 
 for i in range(len(ground_truth)):
@@ -111,3 +97,17 @@ for i in range(len(ground_truth)):
         out_of_CI_ctn += 1
 
 out_of_CI_ptc = out_of_CI_ctn / len(ground_truth) * 100
+
+plt.figure(figsize=(10, 5))
+plt.scatter(X, y, c='k', label='old data')
+plt.scatter(base_range, ground_truth[:len(base_range)], c='r', label='new data')
+plt.plot(base_range, y_gpr, color='darkorange', lw=2,
+         label='GPR (%s)' % gpr.kernel_)
+
+plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
+plt.xlabel('data')
+plt.ylabel('target')
+plt.title('GPR')
+plt.text(0, 0, f"{out_of_CI_ptc:.2f}% of the real prices are outside the confidence interval")
+plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
+plt.show()
