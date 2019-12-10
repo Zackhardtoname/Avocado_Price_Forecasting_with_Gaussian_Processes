@@ -36,7 +36,7 @@ def get_data(type_='organic', region='TotalUS'):
     """
 
     train_path = os.path.join('.','data', type_, 'train', f'{region}.csv')
-    #test_path = os.path.join('.','data', type_, 'test', f'{region}.csv')
+    #test_path = os.path.join('.','data', type_, 'ground_truth', f'{region}.csv')
 
     df_train = pd.read_csv(train_path, index_col='Date')
 

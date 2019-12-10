@@ -18,7 +18,7 @@ def partition(data, split='train'):
 def main():
     for dir_name in [conventional_dir, organic_dir]:
         os.makedirs(os.path.join(dir_name, 'train'), exist_ok=True)
-        os.makedirs(os.path.join(dir_name, 'test'), exist_ok=True)
+        os.makedirs(os.path.join(dir_name, 'ground_truth'), exist_ok=True)
 
 
     for dir_name in [conventional_dir, organic_dir]:
@@ -35,7 +35,7 @@ def main():
             # csv file name without path
             fname = filename.split(os.path.sep)[-1]
             
-            for split in ['train', 'test']:
+            for split in ['train', 'ground_truth']:
                 with open(os.path.join(dir_name, split, fname) , 'w+') as file:
                     file.write(header)
                     file.write(''.join(partition(lines, split=split)))
