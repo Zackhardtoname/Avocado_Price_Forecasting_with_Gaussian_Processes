@@ -103,7 +103,6 @@ plt.scatter(X, y, c='k', label='old data')
 plt.scatter(base_range, ground_truth[:len(base_range)], c='r', label='new data')
 plt.plot(base_range, y_gpr, color='darkorange', lw=2,
          label='GPR (%s)' % gpr.kernel_)
-
 plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
 plt.xlabel('data')
 plt.ylabel('target')
