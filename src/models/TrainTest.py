@@ -112,8 +112,9 @@ plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alph
 plt.xlabel('data')
 plt.ylabel('target')
 plt.title('GPR')
+# todo why is the text not in saved image?
 plt.text(0, 0, f"{100 - out_of_CI_ptc:.2f}% of out-of-sample data points are inside PPCI")
 plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
 plt.grid(True)
-plt.savefig('figure.png')
+plt.savefig('../figures/GPR.png')
 plt.show()
