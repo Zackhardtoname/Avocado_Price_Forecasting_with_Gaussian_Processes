@@ -41,8 +41,13 @@ def get_data(type_='organic', region='TotalUS'):
 
     return df_train
 
-df = get_data(region='California')
-df = df[df["AveragePrice"] != 1]
+region = 'TotalUS'
+df = get_data(region=region)
+
+# filter outliers for California
+if region == "California":
+    df = df[df["AveragePrice"] != 1]
+
 df.index = pd.to_datetime(df.index)
 df.sort_index(inplace=True)
 print(df.groupby(df.index.year).describe())
@@ -107,6 +112,8 @@ plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alph
 plt.xlabel('data')
 plt.ylabel('target')
 plt.title('GPR')
-plt.text(0, 0, f"{out_of_CI_ptc:.2f}% of the real prices are outside the confidence interval")
+plt.text(0, 0, f"{100 - out_of_CI_ptc:.2f}% of out-of-sample data points are inside PPCI")
 plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
+plt.grid(True)
+plt.savefig('figure.png')
 plt.show()
