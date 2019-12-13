@@ -67,7 +67,7 @@ print(df)
 #     + Kernels.RationalQuadratic() \
 #     + Kernels.WhiteKernel(1e-1)
 
-gp_kernel = Kernels.ExpSineSquared(100., 300., periodicity_bounds=(1e-2, 1e8)) \
+gp_kernel = Kernels.ExpSineSquared(100., 200., periodicity_bounds=(1e-2, 1e8)) \
     + Kernels.WhiteKernel(1e1)
 
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True)
@@ -118,9 +118,9 @@ plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label=f'GPR: {gpr.kerne
 plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
 plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
 plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
-plt.xlabel('Week')
-plt.ylabel('Average Avacado Price')
-plt.title(f'GPR-{region}')
+plt.xlabel('Time (Week)')
+plt.ylabel('Average Avacado Price (USD)')
+plt.title(f'GPR: {region} Organic Avacodo Price')
 
 xticks = list(df.index[df.index.year < 2018].strftime('%m-%d-%Y'))
 # Only show every 10th tick
@@ -136,7 +136,7 @@ for label in ax.xaxis.get_ticklabels():
 
 #ax.set_ylim(bottom=np.min(np.concatenate((y_train, y_test))), top=np.max(np.concatenate((y_train, y_test))))
 
-plt.legend(loc='upper left',  scatterpoints=1, prop={'size': 6})
+plt.legend(loc='upper left', scatterpoints=1, prop={'size': 6})
 
 
 #plt.grid(which='both', alpha=0.5)
