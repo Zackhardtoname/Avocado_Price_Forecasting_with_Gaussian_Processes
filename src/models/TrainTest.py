@@ -68,16 +68,18 @@ print(df)
 #     + Kernels.WhiteKernel(1e-1)
 
 gp_kernel = Kernels.ExpSineSquared(100., 300., periodicity_bounds=(1e-2, 1e8)) \
-    + Kernels.WhiteKernel(1e-1)
+    + Kernels.WhiteKernel(1e1)
 
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True)
 gpr.fit(X_train, y_train)
 
 # Predict using gaussian process regressor
-y_gpr, y_std = gpr.predict(X_train, return_std=True)
+y_gpr_train, y_std_train = gpr.predict(X_train, return_std=True)
+y_gpr_test, y_std_test = gpr.predict(X_test, return_std=True)
 
 # Plot results
-y_gpr = y_gpr.flatten()
+y_gpr_train = y_gpr_train.flatten()
+y_gpr_test = y_gpr_test.flatten()
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 X_train = X_train.flatten()
@@ -85,32 +87,37 @@ X_test = X_test.flatten()
 
 
 
-# rmse = np.linalg.norm(y_gpr - y_test) / np.sqrt(test_size)
-# #r_2 = sklearn.metrics.r2_score(y_gpr, y_test)
-# #r = scipy.stats.pearsonr(y_gpr, y_test)
+# rmse = np.linalg.norm(y_gpr_train - y_test) / np.sqrt(test_size)
+# #r_2 = sklearn.metrics.r2_score(y_gpr_train, y_test)
+# #r = scipy.stats.pearsonr(y_gpr_train, y_test)
 
 # print(f'RMSE: {rmse}')
 # print(f'R2 score: {r_2}')
 # print(f'R score: {r}')
 
 z = 1.96
-print(y_gpr)
-print(y_std)
-CI_lower_bound = y_gpr - z * y_std
-CI_higher_bound = y_gpr + z * y_std
+CI_lower_bound_train = y_gpr_train - z * y_std_train
+CI_higher_bound_train = y_gpr_train + z * y_std_train
 
-out_of_CI_ptc = np.sum((y_train < CI_lower_bound) | (y_train > CI_higher_bound)) / len(y_train) * 100
+out_of_CI_ptc_train = np.sum((y_train < CI_lower_bound_train) | (y_train > CI_higher_bound_train)) / len(y_train) * 100
+
+CI_lower_bound_test = y_gpr_test - z * y_std_test
+CI_higher_bound_test = y_gpr_test + z * y_std_test
+
+out_of_CI_ptc_test = np.sum((y_test < CI_lower_bound_test) | (y_test > CI_higher_bound_test)) / len(y_test) * 100
 
 
 # Plotting
 
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(12, 7))
 
 
 plt.scatter(X_train, y_train, c='k', label='2015-2016 Price')
 plt.scatter(X_test, y_test, c='r', label='2017 Price (out-of-sample)')
-plt.plot(X_train, y_gpr, color='darkorange', lw=2, label=f'GPR: {gpr.kernel_}')
-plt.fill_between(X_train, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
+plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label=f'GPR: {gpr.kernel_}')
+plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
+plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
+plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
 plt.xlabel('Week')
 plt.ylabel('Average Avacado Price')
 plt.title(f'GPR-{region}')
@@ -134,6 +141,7 @@ plt.legend(loc='upper left',  scatterpoints=1, prop={'size': 6})
 
 #plt.grid(which='both', alpha=0.5)
 plt.grid(linewidth=0.25, alpha=0.5)
-plt.text(5, 5, f"{100 - out_of_CI_ptc:.2f}% of out-of-sample data points are inside PPCI")
+plt.subplots_adjust(bottom=0.22)
+plt.text(5, 5, f"{100 - out_of_CI_ptc_train:.2f}% of out-of-sample data points are inside PPCI")
 plt.savefig('figures/GPR_.png')
 plt.show()
