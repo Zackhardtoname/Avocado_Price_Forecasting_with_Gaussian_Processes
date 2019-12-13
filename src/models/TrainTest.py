@@ -34,7 +34,7 @@ def get_data(type_='organic', region='TotalUS'):
 
     """
 
-    train_path = os.path.join('.', 'data', type_, 'raw', f'{region}.csv')
+    train_path = os.path.join('../../', 'data', type_, 'raw', f'{region}.csv')
     #test_path = os.path.join('.','data', type_, 'ground_truth', f'{region}.csv')
 
     df_train = pd.read_csv(train_path, index_col='Date')
@@ -42,7 +42,7 @@ def get_data(type_='organic', region='TotalUS'):
     return df_train
 
 
-region = 'TotalUS'
+region = 'California'
 df = get_data(region=region)
 
 # filter outliers for California
@@ -135,7 +135,7 @@ plt.plot(base_range, y_gpr, color='darkorange', lw=2,
 plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
 plt.xlabel('Week')
 plt.ylabel('Average Avacado Price')
-plt.title('GPR')
+plt.title(f'GPR-{region}')
 ax.grid(False)
 
 for i, _ in enumerate(xticks):
@@ -151,6 +151,6 @@ plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
 # Rotates x axis date labels by 45 degrees
 for label in ax.xaxis.get_ticklabels():
     label.set_rotation(45)
-plt.grid(True)
-plt.savefig('figures/GPR_.png')
+plt.grid(which='both', alpha=0.5)
+plt.savefig('../figures/GPR_.png')
 plt.show()
