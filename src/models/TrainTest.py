@@ -56,6 +56,7 @@ df, X_train, y_train, X_test, y_test = get_data(region=region)
 print(df)
 
 
+
 #print(df.head())
 #print(df.groupby(df.index.year).describe())
 
@@ -67,7 +68,10 @@ print(df)
 #     + Kernels.RationalQuadratic() \
 #     + Kernels.WhiteKernel(1e-1)
 
-gp_kernel = Kernels.ExpSineSquared(100., 200., periodicity_bounds=(1e-2, 1e8)) \
+# periodicity of 358 is 1 year. performs poorly on test
+# Best: 100., 200.
+gp_kernel = Kernels.ExpSineSquared(100., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
+    + Kernels.RationalQuadratic(alpha=200., length_scale=138.) \
     + Kernels.WhiteKernel(1e1)
 
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True)
