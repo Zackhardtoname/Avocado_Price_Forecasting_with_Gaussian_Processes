@@ -86,14 +86,20 @@ X_train = X_train.flatten()
 X_test = X_test.flatten()
 
 
+rmse_train = np.sqrt(((y_gpr_train - y_train) ** 2).mean())
+r_2_train = sklearn.metrics.r2_score(y_gpr_train, y_train)
+r_train = scipy.stats.pearsonr(y_gpr_train, y_train)
 
-# rmse = np.linalg.norm(y_gpr_train - y_test) / np.sqrt(test_size)
-# #r_2 = sklearn.metrics.r2_score(y_gpr_train, y_test)
-# #r = scipy.stats.pearsonr(y_gpr_train, y_test)
+rmse_test = np.sqrt(((y_gpr_test - y_test) ** 2).mean())
+r_2_test = sklearn.metrics.r2_score(y_gpr_test, y_test)
+r_test = scipy.stats.pearsonr(y_gpr_test, y_test)
 
-# print(f'RMSE: {rmse}')
-# print(f'R2 score: {r_2}')
-# print(f'R score: {r}')
+print(f'Train RMSE: {rmse_train}')
+print(f'Train R2 score: {r_2_train}')
+print(f'Train R score: {r_train}\n')
+print(f'Test RMSE: {rmse_test}')
+print(f'Test R2 score: {r_2_test}')
+print(f'Test R score: {r_test}\n')
 
 z = 1.96
 CI_lower_bound_train = y_gpr_train - z * y_std_train
@@ -106,6 +112,8 @@ CI_higher_bound_test = y_gpr_test + z * y_std_test
 
 out_of_CI_ptc_test = np.sum((y_test < CI_lower_bound_test) | (y_test > CI_higher_bound_test)) / len(y_test) * 100
 
+print(f'Train CI ptc: {out_of_CI_ptc_train}')
+print(f'Test CI ptc: {out_of_CI_ptc_test}')
 
 # Plotting
 
@@ -114,13 +122,13 @@ fig, ax = plt.subplots(figsize=(12, 7))
 
 plt.scatter(X_train, y_train, c='k', label='2015-2016 Price')
 plt.scatter(X_test, y_test, c='r', label='2017 Price (out-of-sample)')
-plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label=f'GPR: {gpr.kernel_}')
+plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label='GP: ' + "\n       +".join(str(gpr.kernel_).split("+")))
 plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
 plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
 plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
-plt.xlabel('Time (Week)')
+plt.xlabel('Time (Weekly)')
 plt.ylabel('Average Avacado Price (USD)')
-plt.title(f'GPR: {region} Organic Avacodo Price')
+plt.title(f'GPR: {region} Organic Avacado Price')
 
 xticks = list(df.index[df.index.year < 2018].strftime('%m-%d-%Y'))
 # Only show every 10th tick
@@ -136,7 +144,7 @@ for label in ax.xaxis.get_ticklabels():
 
 #ax.set_ylim(bottom=np.min(np.concatenate((y_train, y_test))), top=np.max(np.concatenate((y_train, y_test))))
 
-plt.legend(loc='upper left', scatterpoints=1, prop={'size': 6})
+plt.legend(loc='upper left', scatterpoints=1, prop={'size': 11})
 
 
 #plt.grid(which='both', alpha=0.5)
