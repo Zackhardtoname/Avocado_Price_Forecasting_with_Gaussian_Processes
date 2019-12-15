@@ -1,6 +1,6 @@
 
 import numpy as np
-
+from time import gmtime, strftime
 import matplotlib.pyplot as plt
 
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -74,7 +74,7 @@ gp_kernel = Kernels.ExpSineSquared(100., periodicity=358., periodicity_bounds=(1
     + Kernels.RationalQuadratic(alpha=200., length_scale=138.) \
     + Kernels.WhiteKernel(1e1)
 
-gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True)
+gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=5)
 gpr.fit(X_train, y_train)
 
 # Predict using gaussian process regressor
@@ -150,10 +150,9 @@ for label in ax.xaxis.get_ticklabels():
 
 plt.legend(loc='upper left', scatterpoints=1, prop={'size': 11})
 
-
 #plt.grid(which='both', alpha=0.5)
 plt.grid(linewidth=0.25, alpha=0.5)
 plt.subplots_adjust(bottom=0.22)
 plt.text(5, 5, f"{100 - out_of_CI_ptc_train:.2f}% of out-of-sample data points are inside PPCI")
-plt.savefig('figures/GPR_.png')
+plt.savefig(f'figures/GPR_{strftime("%Y_%m_%d_%H_%M_%S", gmtime())}.png')
 plt.show()
