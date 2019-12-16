@@ -1,6 +1,6 @@
 
 import numpy as np
-
+from time import gmtime, strftime
 import matplotlib.pyplot as plt
 
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -13,10 +13,8 @@ import pandas as pd
 
 import datetime
  
-# MM/DD/YY HH:MM:SS 
-#datetime_obj = datetime.datetime.strptime(datetime_str, '%y/%m/%d')
 
-def get_data(type_='organic', region='TotalUS'):
+def get_data(type_='organic', region='TotalUS', test_year=2017):
     """
     Parameters
     ----------
@@ -34,44 +32,47 @@ def get_data(type_='organic', region='TotalUS'):
 
     """
 
-    train_path = os.path.join('../../', 'data', type_, 'raw', f'{region}.csv')
-    #test_path = os.path.join('.','data', type_, 'ground_truth', f'{region}.csv')
+    train_path = os.path.join('.', 'data', type_, 'train', f'{region}.csv')
+    test_path = os.path.join('.', 'data', type_, 'test', f'{region}.csv')
 
     df_train = pd.read_csv(train_path, index_col='Date')
+    df_test = pd.read_csv(test_path, index_col='Date')
+    #df_train.index = pd.to_datetime(df_train.index)
+    #df_test.index = pd.to_datetime(df_test.index)
 
-    return df_train
+    # filter outliers for California
+    #if region == "California" or "TotalUS":
+    #    df = df[df["AveragePrice"] != 1]
+
+    #y_train = df[df.index.year < test_year].AveragePrice.values.reshape(-1, 1)
+    #y_test = df[df.index.year == test_year].AveragePrice.values.reshape(-1, 1)
+
+    y_train = df_train.AveragePrice.values.reshape(-1, 1)
+    y_test = df_test.AveragePrice.values.reshape(-1, 1)
 
 
-region = 'California'
-df = get_data(region=region)
+    #X_train = np.array([7 * i + 1 for i in range(len(y_train))]).reshape(-1, 1)
+    #X_test = np.array([7 * i + 1 for i in range(len(y_train), len(y_train) + len(y_test))]).reshape(-1, 1)
 
-# filter outliers for California
-if region == "California" or "TotalUS":
-    df = df[df["AveragePrice"] != 1]
+    X_train = np.array([7 * i + 1 for i in range(len(y_train))]).reshape(-1, 1)
+    X_test = np.array([7 * i + 1 for i in range(len(y_train), len(y_train) + len(y_test))]).reshape(-1, 1)
 
-df.index = pd.to_datetime(df.index)
-df.sort_index(inplace=True)
-print(df.head())
-print(df.groupby(df.index.year).describe())
+    df = pd.concat((df_train, df_test), join="inner")
+    df.index = pd.to_datetime(df.index)
 
-# 2018 only has 12 data points
-last_year = df.index.year.unique()[-2]
-train = df[df.index.year < last_year].AveragePrice.values.reshape(-1, 1)
-ground_truth = df[df.index.year == last_year].AveragePrice.values
+    return df, X_train, y_train, X_test, y_test
 
-# the ticks for a year
-base_range = list(range(1, 365, 7))
-X = []
 
-for _ in range(len(train) // 52):
-    X += base_range
+region = 'WestTexNewMexico'
+df, X_train, y_train, X_test, y_test = get_data(region=region)
 
-print(X)
-# get the data truncated by years    
-train = train[:(len(train) // 52) * 52, ]
-y = train
-X = np.array(X).reshape(-1, 1)
-# assert len(X) == len(y)
+# print(df)
+
+
+
+#print(df.head())
+#print(df.groupby(df.index.year).describe())
+
 
 # gp_kernel = Kernels.ExpSineSquared(2.0, 6.0, periodicity_bounds=(1e-2, 1e5)) \
 #     + Kernels.WhiteKernel() \
@@ -80,77 +81,90 @@ X = np.array(X).reshape(-1, 1)
 #     + Kernels.RationalQuadratic() \
 #     + Kernels.WhiteKernel(1e-1)
 
-gp_kernel = Kernels.ExpSineSquared(2.0, 6.0, periodicity_bounds=(1e-2, 1e5)) \
-    + Kernels.WhiteKernel(1e-1)
+# periodicity of 358 is 1 year. performs poorly on test
+# Best: 100., 200.
+gp_kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
+    + 0.8 * Kernels.RationalQuadratic(alpha=20., length_scale=80.) \
+    + Kernels.WhiteKernel(1e2)
 
-gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True)
-gpr.fit(X, y)
+gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=10)
+gpr.fit(X_train, y_train)
 
 # Predict using gaussian process regressor
-y_gpr, y_std = gpr.predict(np.array(base_range).reshape(-1, 1), return_std=True)
-# y_gpr = np.array(y_gpr)
-# y_std = np.array(y_std)
+y_gpr_train, y_std_train = gpr.predict(X_train, return_std=True)
+y_gpr_test, y_std_test = gpr.predict(X_test, return_std=True)
+
 # Plot results
-y_gpr = y_gpr.flatten()
+y_gpr_train = y_gpr_train.flatten()
+y_gpr_test = y_gpr_test.flatten()
+y_train = y_train.flatten()
+y_test = y_test.flatten()
+X_train = X_train.flatten()
+X_test = X_test.flatten()
 
-test_size = len(y_gpr)
-ground_truth = ground_truth[:test_size]
 
-rmse = np.linalg.norm(y_gpr - ground_truth) / np.sqrt(test_size)
-r_2 = sklearn.metrics.r2_score(y_gpr, ground_truth)
-r = scipy.stats.pearsonr(y_gpr, ground_truth)
+rmse_train = np.sqrt(((y_gpr_train - y_train) ** 2).mean())
+r_2_train = sklearn.metrics.r2_score(y_gpr_train, y_train)
 
-print(f'RMSE: {rmse}')
-print(f'R2 score: {r_2}')
-print(f'R score: {r}')
+rmse_test = np.sqrt(((y_gpr_test - y_test) ** 2).mean())
+r_2_test = sklearn.metrics.r2_score(y_gpr_test, y_test)
+
+print(f'Train RMSE: {rmse_train}')
+print(f'Train R2 score: {r_2_train}')
+print(f'Test RMSE: {rmse_test}')
+print(f'Test R2 score: {r_2_test}')
+print(f'Predicted mean: {y_gpr_test.mean()}\n')
+print(f'Test mean: {y_test.mean()}\n')
 
 z = 1.96
-CI_lower_bound = y_gpr - z * y_std
-CI_higher_bound = y_gpr + z * y_std
-out_of_CI_ctn = 0
+CI_lower_bound_train = y_gpr_train - z * y_std_train
+CI_higher_bound_train = y_gpr_train + z * y_std_train
 
-for i in range(len(ground_truth)):
-    if ground_truth[i] < CI_lower_bound[i] or ground_truth[i] > CI_higher_bound[i]:
-        out_of_CI_ctn += 1
+out_of_CI_ptc_train = np.sum((y_train < CI_lower_bound_train) | (y_train > CI_higher_bound_train)) / len(y_train) * 100
 
-out_of_CI_ptc = out_of_CI_ctn / len(ground_truth) * 100
+CI_lower_bound_test = y_gpr_test - z * y_std_test
+CI_higher_bound_test = y_gpr_test + z * y_std_test
 
+out_of_CI_ptc_test = np.sum((y_test < CI_lower_bound_test) | (y_test > CI_higher_bound_test)) / len(y_test) * 100
+
+print(f'Train CI ptc: {out_of_CI_ptc_train}')
+print(f'Test CI ptc: {out_of_CI_ptc_test}')
+
+print(f'Model: {str(gpr.kernel_)}')
 
 # Plotting
 
 fig, ax = plt.subplots(figsize=(10, 5))
-print(df.index)
-print(len(y))
-#xticks = pd.date_range(start=df.index[0], end=df.index[52], freq='Y')
-#print(xticks)
-#ax.set_xticklabels([x.strftime('%m-%d') for x in xticks])
 
-xticks = list(df.index[0:52].strftime('%m-%d'))
-print(f'xtick len {len(xticks)}')
-print(xticks)
-plt.scatter(X, y, c='k', label='2015-2016 Price')
-plt.scatter(base_range, ground_truth[:len(base_range)], c='r', label='2017 Price')
-plt.plot(base_range, y_gpr, color='darkorange', lw=2,
-         label='GPR (%s)' % gpr.kernel_)
-plt.fill_between(base_range, CI_lower_bound, CI_higher_bound, color='blue', alpha=0.2)
-plt.xlabel('Week')
-plt.ylabel('Average Avacado Price')
-plt.title(f'GPR-{region}')
-ax.grid(False)
 
-for i, _ in enumerate(xticks):
-    if i % 2 == 0:
+plt.scatter(X_train, y_train, c='k', s=10, label='Train')
+plt.scatter(X_test, y_test, c='r', s=10, label='Test')
+plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label='GP')
+plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
+plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
+plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
+plt.xlabel('Time (Weekly)')
+plt.ylabel('Average Avocado Price (USD)')
+plt.title(f'GPR: {region} Organic Avocado Price')
+
+xticks = list(df.index.strftime('%m-%d-%Y'))
+# Only show every 10th tick
+for i in range(len(xticks)):
+    if i % 10:
         xticks[i] = ''
-plt.xticks(X, labels=xticks)
-plt.grid(b=None)
 
-# todo why is the text not in saved image?
-plt.text(0.5, 0.5, f"{100 - out_of_CI_ptc:.2f}% of out-of-sample data points are inside PPCI")
-plt.legend(loc="best",  scatterpoints=1, prop={'size': 8})
-#x.tick_params(xticks, axis='x', labelsize=6)
+plt.xticks(np.concatenate((X_train, X_test)), labels=xticks)
+
 # Rotates x axis date labels by 45 degrees
 for label in ax.xaxis.get_ticklabels():
     label.set_rotation(45)
-plt.grid(which='both', alpha=0.5)
-plt.savefig('../figures/GPR_.png')
+
+#ax.set_ylim(bottom=np.min(np.concatenate((y_train, y_test))), top=np.max(np.concatenate((y_train, y_test))))
+
+plt.legend(loc='upper left', scatterpoints=1, prop={'size': 8})
+
+#plt.grid(which='both', alpha=0.5)
+plt.grid(linewidth=0.25, alpha=0.5)
+plt.subplots_adjust(bottom=0.22)
+plt.savefig(f'figures/GPR_{strftime("%Y_%m_%d_%H_%M_%S", gmtime())}.png')
 plt.show()
