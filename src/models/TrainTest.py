@@ -63,7 +63,7 @@ def get_data(type_='organic', region='TotalUS', test_year=2017):
     return df, X_train, y_train, X_test, y_test
 
 
-region = 'California'
+region = 'WestTexNewMexico'
 df, X_train, y_train, X_test, y_test = get_data(region=region)
 
 # print(df)
@@ -83,9 +83,9 @@ df, X_train, y_train, X_test, y_test = get_data(region=region)
 
 # periodicity of 358 is 1 year. performs poorly on test
 # Best: 100., 200.
-gp_kernel = Kernels.ExpSineSquared(100., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
-    + 0.5 * Kernels.RationalQuadratic(alpha=200., length_scale=138.) \
-    + Kernels.WhiteKernel(1e1)
+gp_kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
+    + 0.8 * Kernels.RationalQuadratic(alpha=20., length_scale=80.) \
+    + Kernels.WhiteKernel(1e2)
 
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=10)
 gpr.fit(X_train, y_train)
