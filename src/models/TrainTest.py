@@ -113,6 +113,8 @@ print(f'Train RMSE: {rmse_train}')
 print(f'Train R2 score: {r_2_train}')
 print(f'Test RMSE: {rmse_test}')
 print(f'Test R2 score: {r_2_test}')
+print(f'Predicted mean: {y_gpr_test.mean()}\n')
+print(f'Test mean: {y_test.mean()}\n')
 
 z = 1.96
 CI_lower_bound_train = y_gpr_train - z * y_std_train
