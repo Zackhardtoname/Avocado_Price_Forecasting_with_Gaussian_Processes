@@ -146,8 +146,8 @@ plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
 plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
 plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
 plt.xlabel('Time (Weekly)')
-plt.ylabel('Average Avacado Price (USD)')
-plt.title(f'GPR: {region} Organic Avacado Price')
+plt.ylabel('Average Avocado Price (USD)')
+plt.title(f'GPR: {region} Organic Avocado Price')
 
 xticks = list(df.index.strftime('%m-%d-%Y'))
 # Only show every 10th tick
