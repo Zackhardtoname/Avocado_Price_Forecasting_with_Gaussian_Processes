@@ -132,14 +132,16 @@ out_of_CI_ptc_test = np.sum((y_test < CI_lower_bound_test) | (y_test > CI_higher
 print(f'Train CI ptc: {out_of_CI_ptc_train}')
 print(f'Test CI ptc: {out_of_CI_ptc_test}')
 
+print(f'Model: {str(gpr.kernel_)}')
+
 # Plotting
 
 fig, ax = plt.subplots(figsize=(10, 5))
 
 
-plt.scatter(X_train, y_train, c='k', label='2015-2016 Price')
-plt.scatter(X_test, y_test, c='r', label='2017 Price (out-of-sample)')
-plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label='GP: ' + "\n       +".join(str(gpr.kernel_).split("+")))
+plt.scatter(X_train, y_train, c='k', s=10, label='Train')
+plt.scatter(X_test, y_test, c='r', s=10, label='Test')
+plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label='GP')
 plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
 plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
 plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
@@ -161,11 +163,10 @@ for label in ax.xaxis.get_ticklabels():
 
 #ax.set_ylim(bottom=np.min(np.concatenate((y_train, y_test))), top=np.max(np.concatenate((y_train, y_test))))
 
-plt.legend(loc='upper left', scatterpoints=1, prop={'size': 11})
+plt.legend(loc='upper left', scatterpoints=1, prop={'size': 8})
 
 #plt.grid(which='both', alpha=0.5)
 plt.grid(linewidth=0.25, alpha=0.5)
 plt.subplots_adjust(bottom=0.22)
-plt.text(5, 5, f"{100 - out_of_CI_ptc_train:.2f}% of out-of-sample data points are inside PPCI")
 plt.savefig(f'figures/GPR_{strftime("%Y_%m_%d_%H_%M_%S", gmtime())}.png')
 plt.show()
