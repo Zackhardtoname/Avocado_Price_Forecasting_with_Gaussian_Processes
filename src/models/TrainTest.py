@@ -32,20 +32,33 @@ def get_data(type_='organic', region='TotalUS', test_year=2017):
 
     """
 
-    train_path = os.path.join('.', 'data', type_, 'raw', f'{region}.csv')
+    train_path = os.path.join('.', 'data', type_, 'train', f'{region}.csv')
+    test_path = os.path.join('.', 'data', type_, 'test', f'{region}.csv')
 
-    df = pd.read_csv(train_path, index_col='Date')
-    df.index = pd.to_datetime(df.index)
+    df_train = pd.read_csv(train_path, index_col='Date')
+    df_test = pd.read_csv(test_path, index_col='Date')
+    #df_train.index = pd.to_datetime(df_train.index)
+    #df_test.index = pd.to_datetime(df_test.index)
 
     # filter outliers for California
     #if region == "California" or "TotalUS":
     #    df = df[df["AveragePrice"] != 1]
 
-    y_train = df[df.index.year < test_year].AveragePrice.values.reshape(-1, 1)
-    y_test = df[df.index.year == test_year].AveragePrice.values.reshape(-1, 1)
+    #y_train = df[df.index.year < test_year].AveragePrice.values.reshape(-1, 1)
+    #y_test = df[df.index.year == test_year].AveragePrice.values.reshape(-1, 1)
+
+    y_train = df_train.AveragePrice.values.reshape(-1, 1)
+    y_test = df_test.AveragePrice.values.reshape(-1, 1)
+
+
+    #X_train = np.array([7 * i + 1 for i in range(len(y_train))]).reshape(-1, 1)
+    #X_test = np.array([7 * i + 1 for i in range(len(y_train), len(y_train) + len(y_test))]).reshape(-1, 1)
 
     X_train = np.array([7 * i + 1 for i in range(len(y_train))]).reshape(-1, 1)
     X_test = np.array([7 * i + 1 for i in range(len(y_train), len(y_train) + len(y_test))]).reshape(-1, 1)
+
+    df = pd.concat((df_train, df_test), join="inner")
+    df.index = pd.to_datetime(df.index)
 
     return df, X_train, y_train, X_test, y_test
 
@@ -53,7 +66,7 @@ def get_data(type_='organic', region='TotalUS', test_year=2017):
 region = 'California'
 df, X_train, y_train, X_test, y_test = get_data(region=region)
 
-print(df)
+# print(df)
 
 
 
@@ -71,10 +84,10 @@ print(df)
 # periodicity of 358 is 1 year. performs poorly on test
 # Best: 100., 200.
 gp_kernel = Kernels.ExpSineSquared(100., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
-    + Kernels.RationalQuadratic(alpha=200., length_scale=138.) \
+    + 0.5 * Kernels.RationalQuadratic(alpha=200., length_scale=138.) \
     + Kernels.WhiteKernel(1e1)
 
-gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=5)
+gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=10)
 gpr.fit(X_train, y_train)
 
 # Predict using gaussian process regressor
@@ -121,7 +134,7 @@ print(f'Test CI ptc: {out_of_CI_ptc_test}')
 
 # Plotting
 
-fig, ax = plt.subplots(figsize=(12, 7))
+fig, ax = plt.subplots(figsize=(10, 5))
 
 
 plt.scatter(X_train, y_train, c='k', label='2015-2016 Price')
@@ -134,7 +147,7 @@ plt.xlabel('Time (Weekly)')
 plt.ylabel('Average Avacado Price (USD)')
 plt.title(f'GPR: {region} Organic Avacado Price')
 
-xticks = list(df.index[df.index.year < 2018].strftime('%m-%d-%Y'))
+xticks = list(df.index.strftime('%m-%d-%Y'))
 # Only show every 10th tick
 for i in range(len(xticks)):
     if i % 10:
