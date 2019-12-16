@@ -105,18 +105,14 @@ X_test = X_test.flatten()
 
 rmse_train = np.sqrt(((y_gpr_train - y_train) ** 2).mean())
 r_2_train = sklearn.metrics.r2_score(y_gpr_train, y_train)
-r_train = scipy.stats.pearsonr(y_gpr_train, y_train)
 
 rmse_test = np.sqrt(((y_gpr_test - y_test) ** 2).mean())
 r_2_test = sklearn.metrics.r2_score(y_gpr_test, y_test)
-r_test = scipy.stats.pearsonr(y_gpr_test, y_test)
 
 print(f'Train RMSE: {rmse_train}')
 print(f'Train R2 score: {r_2_train}')
-print(f'Train R score: {r_train}\n')
 print(f'Test RMSE: {rmse_test}')
 print(f'Test R2 score: {r_2_test}')
-print(f'Test R score: {r_test}\n')
 
 z = 1.96
 CI_lower_bound_train = y_gpr_train - z * y_std_train
