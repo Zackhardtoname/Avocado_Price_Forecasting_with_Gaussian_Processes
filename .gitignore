@@ -1,5 +1,6 @@
 # miscellaneous
 *.idea
+*.png
 
 # Python
 venv
@@ -13,3 +14,4 @@ env/
 .Rhistory
 .RData
 .Ruserdata
+
