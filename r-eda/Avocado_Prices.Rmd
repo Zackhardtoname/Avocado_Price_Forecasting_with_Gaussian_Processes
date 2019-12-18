@@ -1,0 +1,106 @@
+---
+title: "Avocado Prices Project"
+author: "Rohan Janakiraman"
+date: "11/26/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+```
+
+```{r}
+install.packages("GauPro")
+```
+
+
+```{r}
+prices <- Avocado_Prices_Data[c(3)]
+typeof(prices)
+#hist(prices)
+```
+
+```{r}
+library("readxl")
+# xlsx files
+my_data <- read_excel(file.choose())
+```
+
+```{r}
+install.packages("e1071")
+library(e1071)
+```
+
+```{r}
+my_data
+prices <- my_data[c(3)]
+#with(my_data, hist(AveragePrice, main="Distribution of Avocado Prices",
+#xlab="Average Avocado Price", breaks=120, col = "darkmagenta"))
+#with(my_data, mean(AveragePrice))
+#with(my_data, mode(AveragePrice))
+#with(my_data, var(AveragePrice))
+#with(my_data, range(AveragePrice))
+#with(my_data, quantile(AveragePrice, c(0.05, 0.95)))
+
+library(dplyr)
+#Plots 2015 Data and Gives Info about Mean, Mode, Variance, Range, Quantile, Kurtosis
+avocado_data_2015 = filter(my_data, my_data$year == 2015)
+avocado_data_2015
+with(avocado_data_2015, hist(AveragePrice, main="Distribution of Avocado Prices, 2015",
+xlab="Average Avocado Price", breaks=120, col = "red"))
+with(avocado_data_2015, mean(AveragePrice))
+with(avocado_data_2015, mode(AveragePrice))
+with(avocado_data_2015, var(AveragePrice))
+with(avocado_data_2015, range(AveragePrice))
+with(avocado_data_2015, quantile(AveragePrice, c(0.05, 0.95)))
+
+#Plots 2016 Data and Gives Info about Mean, Mode, Variance, Range, Quantile, Kurtosis
+avocado_data_2016 = filter(my_data, my_data$year == 2016)
+with(avocado_data_2016, hist(AveragePrice, main="Distribution of Avocado Prices, 2016",
+xlab="Average Avocado Price", breaks=120, col = "yellow"))
+with(avocado_data_2016, mean(AveragePrice))
+with(avocado_data_2016, mode(AveragePrice))
+with(avocado_data_2016, var(AveragePrice))
+with(avocado_data_2016, range(AveragePrice))
+with(avocado_data_2016, quantile(AveragePrice, c(0.05, 0.95)))
+
+#Plots 2017 Data and Gives Info about Mean, Mode, Variance, Range, Quantile, Kurtosis
+avocado_data_2017 = filter(my_data, my_data$year == 2017)
+with(avocado_data_2017, hist(AveragePrice, main="Distribution of Avocado Prices, 2017",
+xlab="Average Avocado Price", breaks=120, col = "#6ba304"))
+with(avocado_data_2017, mean(AveragePrice))
+with(avocado_data_2017, mode(AveragePrice))
+with(avocado_data_2017, var(AveragePrice))
+with(avocado_data_2017, range(AveragePrice))
+
+#Plots 2018 Data and Gives Info about Mean, Mode, Variance, Range, Quantile, Kurtosis
+avocado_data_2018 = filter(my_data, my_data$year == 2018)
+with(avocado_data_2018, hist(AveragePrice, main="Distribution of Avocado Prices, 2018",
+xlab="Average Avocado Price", breaks=120, col = "#568203"))
+with(avocado_data_2018, mean(AveragePrice))
+with(avocado_data_2018, mode(AveragePrice))
+with(avocado_data_2018, var(AveragePrice))
+with(avocado_data_2018, range(AveragePrice))
+with(avocado_data_2018, quantile(AveragePrice, c(0.05, 0.95)))
+
+
+with(my_data, hist(AveragePrice, main="Distribution of Avocado Prices",
+xlab="Average Avocado Price", breaks=120, col =  "#6ba304"))
+```
+
+
+
+```{r}
+library(tidyverse)
+modified_data = filter(my_data, year == c(2015, 2016, 2017, 2018))
+ ggplot(data = modified_data, mapping = aes(x = Date, y = AveragePrice)) + 
+  geom_point(mapping = aes(color = "red")) + 
+  geom_smooth() + facet_wrap(~type, nrow = 2)
+```
+
+```{r}
+#Box Whisker Plot of Price Range by Type
+library(tidyverse)
+modified_data = filter(my_data, region == c("Boston", "DallasFtWorth" ,"Detroit", "NewYork", "SanDiego", "SanFrancisco", "NewYork"))
+regional_plot = ggplot(data = modified_data, mapping = aes(x = region, y = AveragePrice)) + geom_boxplot(color = "#6ba304", fill = "#568203") + facet_wrap(~ type) + coord_flip()
+print(regional_plot + ggtitle("Avocado Price Range By Region and Type"))
+```
