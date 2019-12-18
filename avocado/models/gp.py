@@ -90,7 +90,8 @@ def run_gp(kernel,
     print(f'Model: {str(gpr.kernel_)}')
 
     # Plot the train and test results
-    utils.plot(region,
+    utils.plot(type_,
+               region,
                df,
                X_train, y_train, 
                X_test, y_test,
@@ -112,7 +113,7 @@ kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e-2,
     + Kernels.WhiteKernel(1e2)
 
 
-run_gp(kernel)
+run_gp(kernel, type_=type_, region=region)
 
 
 # + Kernels.ExpSineSquared(20., periodicity=158., periodicity_bounds=(1e-2, 1e8)) \

@@ -46,7 +46,8 @@ def get_data(type_='organic', region='TotalUS'):
     return df, X_train, y_train, X_test, y_test
 
 
-def plot(region,
+def plot(type_,
+         region,
          df,
          X_train, y_train, 
          X_test, y_test,
@@ -58,6 +59,9 @@ def plot(region,
     """
     Parameters
     ----------
+    type_ : str
+        conventional or organic
+
     region : str
         US region e.g. SanFrancisco
 
@@ -106,7 +110,7 @@ def plot(region,
     # Add x/y labels and plot title
     plt.xlabel('Time (Weekly)')
     plt.ylabel('Average Avocado Price (USD)')
-    plt.title(f'GPR: {region} Organic Avocado Price')
+    plt.title(f'GPR: {region} {type_.title()} Avocado Price')
 
     # Convert pd.datetime to string datetime
     xticks = list(df.index.strftime('%m-%d-%Y'))
