@@ -17,11 +17,5 @@ def main():
     run_gp(kernel, n_restarts_optimizer=10, type_=type_, region=region)
 
 
-    # + Kernels.ExpSineSquared(20., periodicity=158., periodicity_bounds=(1e-2, 1e8)) \
-    # + Kernels.ExpSineSquared(20., periodicity=79., periodicity_bounds=(1e-2, 1e8)) \
-    # + Kernels.ExpSineSquared(20., periodicity=30., periodicity_bounds=(1e-2, 1e8)) \
-
-
-
 if __name__ == '__main__':
     main()
