@@ -1,4 +1,4 @@
-# stats_451_final_project
+# STATS 451 - Bayesian Data Analysis - Final Project
 
 Run the following commands from the terminal on linux/mac
 
