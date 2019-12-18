@@ -11,7 +11,7 @@ def build_data_dir():
 
 def main():
     """
-    Script to preprocess data into seperate files.
+    Script to preprocess raw data into seperate files.
     Creates directories:
         ./data/conventional/
         ./data/organic/

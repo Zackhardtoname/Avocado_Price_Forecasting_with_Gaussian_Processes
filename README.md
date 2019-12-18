@@ -15,7 +15,7 @@ pip install -e .
 After setup run:
 
 ```
-python3 avocado/models/TrainTest.py
+python3 models/main.py
 ```
 
 Depending on your operating system, running the above line may automatically
