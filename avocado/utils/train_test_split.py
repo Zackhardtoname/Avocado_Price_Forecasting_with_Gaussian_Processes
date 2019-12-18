@@ -6,19 +6,37 @@ DATA_DIR = os.path.join('.', 'data')
 conventional_dir = os.path.join(DATA_DIR, 'conventional')
 organic_dir = os.path.join(DATA_DIR, 'organic')
 
+# Define 80-20 train test split
 TRAIN_PARTITION = 0.8
 TEST_PARTITION = 0.2
 
 def partition(data, split='train'):
+    """
+    Parameters
+    ----------
+    data : list
+        contains price data
+
+    split : str
+        'train' or 'test'
+
+    Effects
+    -------
+    Returns list elements in the train/test partition.
+    """
     if split == 'train':
         return data[:int(len(data)*TRAIN_PARTITION)]
     else:
         return data[int(len(data)*TRAIN_PARTITION):]
 
 def main():
+    """
+    Splits raw price data into train/test data sets.
+    Creates output directories if they don't already exist.
+    """
     for dir_name in [conventional_dir, organic_dir]:
         os.makedirs(os.path.join(dir_name, 'train'), exist_ok=True)
-        os.makedirs(os.path.join(dir_name, 'ground_truth'), exist_ok=True)
+        os.makedirs(os.path.join(dir_name, 'test'), exist_ok=True)
 
 
     for dir_name in [conventional_dir, organic_dir]:
@@ -35,7 +53,7 @@ def main():
             # csv file name without path
             fname = filename.split(os.path.sep)[-1]
             
-            for split in ['train', 'ground_truth']:
+            for split in ['train', 'test']:
                 with open(os.path.join(dir_name, split, fname) , 'w+') as file:
                     file.write(header)
                     file.write(''.join(partition(lines, split=split)))

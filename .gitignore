@@ -1,10 +1,13 @@
 # miscellaneous
 *.idea
+*.png
 
 # Python
 venv
 .ipynb_checkpoints/
 __pycache__
+env/
+*.egg-info
 
 # R
 .Rproj.user
