@@ -26,7 +26,7 @@ def get_loc(str):
         except:
             return None
 
-df = pd.read_csv('../../data/original.csv')
+df = pd.read_csv('./data/original.csv')
 df = df[df["type"] == "organic"]
 df = df.groupby('region', as_index=False)['AveragePrice'].mean()
 df = df[df["region"] != "TotalUS"]
