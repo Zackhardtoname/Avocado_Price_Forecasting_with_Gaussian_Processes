@@ -1,0 +1,36 @@
+---
+title: "Avocado_Dataset_Summary_Statistics"
+author: "Rohan Janakiraman"
+date: "12/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(tidyverse)
+
+#The variable my_data is a global variable that contains all the records of the Avocado Prices Dataset
+
+
+#Summary Statistics for Numeric Variables
+nrow(my_data)
+my_data %>% select_if(is.numeric) %>% summary()
+
+#Selecting Relevant Columns + Calculating Standard Deviation for Each Numeric Variable
+numeric_variables <- my_data %>% select_if(is.numeric) %>% colnames()
+relevant_columns <- my_data %>% select(AveragePrice, `Total Volume`, `4046`, `4225`, `4770`, `Total Bags`, `Small Bags`, `Large Bags`, `XLarge Bags`)
+relevant_columns %>% apply(2, sd)
+
+```
+```
