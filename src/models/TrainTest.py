@@ -83,6 +83,6 @@ plt.subplots_adjust(bottom=0.22)
 plt.savefig(f'figures/GPR_{strftime("%Y_%m_%d_%H_%M_%S", gmtime())}.png')
 plt.show()
 
-# Svae the results for potential future analysis
+# Save the results for potential future analysis
 results = pd.DataFrame({'truth': y_test, 'predicted_val': y_gpr_test, "predicted_std": y_std_test}, index=df.index[len(y_train):])
 results.to_pickle("./data/regression_results.pkl")
