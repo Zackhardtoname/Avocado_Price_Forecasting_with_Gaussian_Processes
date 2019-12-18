@@ -3,6 +3,7 @@ from avocado.models.gp import run_gp
 
 
 def main():
+    # Specify type_ and region of data
     type_ = 'organic' 
     region = 'WestTexNewMexico'
 
@@ -12,6 +13,7 @@ def main():
         + Kernels.WhiteKernel(1e2)
 
 
+    # Fit gp model and plot
     run_gp(kernel, type_=type_, region=region)
 
 
