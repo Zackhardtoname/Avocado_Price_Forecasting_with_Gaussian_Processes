@@ -21,3 +21,8 @@ if test_year:
     y_test = df[df.index.year == test_year].AveragePrice.values.reshape(-1, 1)
 
 # ax.set_ylim(bottom=np.min(np.concatenate((y_train, y_test))), top=np.max(np.concatenate((y_train, y_test))))
+
+# best code in the while project
+li = [y_gpr_train, y_gpr_test, y_train, y_test, X_train, X_test]
+to_be_run = "\n".join([f"{namestr(ele, globals())[0]} = {namestr(ele, globals())[0]}.flatten()" for ele in li])
+exec(to_be_run)

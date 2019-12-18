@@ -15,6 +15,10 @@ gp_kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e
     + 0.8 * Kernels.RationalQuadratic(alpha=20., length_scale=80.) \
     + Kernels.WhiteKernel(1e2)
 
+# + Kernels.ExpSineSquared(20., periodicity=158., periodicity_bounds=(1e-2, 1e8)) \
+# + Kernels.ExpSineSquared(20., periodicity=79., periodicity_bounds=(1e-2, 1e8)) \
+# + Kernels.ExpSineSquared(20., periodicity=30., periodicity_bounds=(1e-2, 1e8)) \
+
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=10)
 gpr.fit(X_train, y_train)
 
@@ -23,8 +27,12 @@ y_gpr_train, y_std_train = gpr.predict(X_train, return_std=True)
 y_gpr_test, y_std_test = gpr.predict(X_test, return_std=True)
 
 # Print the results
-for data in [y_gpr_train, y_gpr_test, y_train, y_test, X_train, X_test]:
-    data = data.flatten()
+y_gpr_train = y_gpr_train.flatten()
+y_gpr_test = y_gpr_test.flatten()
+y_train = y_train.flatten()
+y_test = y_test.flatten()
+X_train = X_train.flatten()
+X_test = X_test.flatten()
 
 rmse_train = np.sqrt(((y_gpr_train - y_train) ** 2).mean())
 r_2_train = sklearn.metrics.r2_score(y_gpr_train, y_train)
@@ -89,3 +97,9 @@ plt.show()
 # Save the results for potential future analysis
 results = pd.DataFrame({'truth': y_test, 'predicted_val': y_gpr_test, "predicted_std": y_std_test}, index=df.index[len(y_train):])
 results.to_pickle("./data/regression_results.pkl")
+
+more_X_train = np.arange(925, 2000, 7).reshape(-1, 1)
+more_y_val, more_y_std = gpr.predict(more_X_train, return_std=True)
+
+plt.plot(more_X_train, more_y_val)
+plt.show()
