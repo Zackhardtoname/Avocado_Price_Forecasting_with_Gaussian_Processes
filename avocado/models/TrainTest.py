@@ -5,11 +5,16 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 import sklearn.gaussian_process.kernels as Kernels
 import sklearn.metrics
 import pandas as pd
-import data
+import datetime
 
+from avocado.utils.data import get_data
+ 
 region = 'WestTexNewMexico'
-df, X_train, y_train, X_test, y_test = data.get_data(region=region)
+df, X_train, y_train, X_test, y_test = get_data(region=region)
 
+
+# periodicity of 358 is 1 year. performs poorly on test
+# Best: 100., 200.
 # specify the kernel functions; please see the paper for the rationale behind the choices
 gp_kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
     + 0.8 * Kernels.RationalQuadratic(alpha=20., length_scale=80.) \
