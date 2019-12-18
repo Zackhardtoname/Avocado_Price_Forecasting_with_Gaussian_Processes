@@ -119,11 +119,17 @@ print(regional_plot + ggtitle("Avocado Price Range By Region and Type"))
 
 ```{r}
 #Tabulating Differences between Conventional and Organic Data -- For use later in paper
-my_data
+
 organic_data = filter(my_data, type == "organic")
 conventional_data = filter(my_data, type == "conventional")
 mean(organic_data$AveragePrice)
 mean(conventional_data$AveragePrice)
 var(organic_data$AveragePrice)
 var(conventional_data$AveragePrice)
+nrow(organic_data)
+nrow(conventional_data)
+quantile(organic_data$AveragePrice, 0.75)
+quantile(organic_data$AveragePrice, 0.25)
+quantile(conventional_data$AveragePrice, 0.75)
+quantile(conventional_data$AveragePrice, 0.25)
 ```
