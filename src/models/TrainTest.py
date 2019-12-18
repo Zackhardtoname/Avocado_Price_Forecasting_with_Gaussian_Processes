@@ -12,12 +12,10 @@ df, X_train, y_train, X_test, y_test = data.get_data(region=region)
 
 # specify the kernel functions; please see the paper for the rationale behind the choices
 gp_kernel = Kernels.ExpSineSquared(20., periodicity=358., periodicity_bounds=(1e-2, 1e8)) \
+    + Kernels.ExpSineSquared(20., periodicity=158., periodicity_bounds=(1e-2, 1e8)) \
+    + Kernels.ExpSineSquared(20., periodicity=79., periodicity_bounds=(1e-2, 1e8)) \
     + 0.8 * Kernels.RationalQuadratic(alpha=20., length_scale=80.) \
-    + Kernels.WhiteKernel(1e2)
-
-# + Kernels.ExpSineSquared(20., periodicity=158., periodicity_bounds=(1e-2, 1e8)) \
-# + Kernels.ExpSineSquared(20., periodicity=79., periodicity_bounds=(1e-2, 1e8)) \
-# + Kernels.ExpSineSquared(20., periodicity=30., periodicity_bounds=(1e-2, 1e8)) \
+    + Kernels.WhiteKernel(.05, noise_level_bounds="fixed")
 
 gpr = GaussianProcessRegressor(kernel=gp_kernel, normalize_y=True, n_restarts_optimizer=10)
 gpr.fit(X_train, y_train)
@@ -102,4 +100,5 @@ more_X_train = np.arange(925, 2000, 7).reshape(-1, 1)
 more_y_val, more_y_std = gpr.predict(more_X_train, return_std=True)
 
 plt.plot(more_X_train, more_y_val)
+plt.grid()
 plt.show()
