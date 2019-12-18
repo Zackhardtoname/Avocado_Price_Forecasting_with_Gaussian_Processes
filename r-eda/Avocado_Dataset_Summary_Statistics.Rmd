@@ -20,8 +20,7 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 ```{r}
 library(tidyverse)
 
-#The variable my_data is a global variable that contains all the records of the Avocado Prices Dataset
-
+my_data <- read.csv('stats_451_final_project/data/original.csv')
 
 #Summary Statistics for Numeric Variables
 nrow(my_data)
