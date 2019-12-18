@@ -39,7 +39,8 @@ def run_gp(kernel,
     # Define GP model with kernel function. 
     # Set prior mean to train sample mean.
     # Try n_restarts_optimizer different random samples from the hyperparameter space
-    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=True, n_restarts_optimizer=n_restarts_optimizer)
+    # Random state for reproducibility
+    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=True, n_restarts_optimizer=n_restarts_optimizer, random_state=451)
 
     # Fit GP model on training data
     gpr.fit(X_train, y_train)
