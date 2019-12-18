@@ -12,17 +12,9 @@ output: html_document
 install.packages("GauPro")
 ```
 
-
 ```{r}
-prices <- Avocado_Prices_Data[c(3)]
-typeof(prices)
-#hist(prices)
-```
-
-```{r}
-library("readxl")
-# xlsx files
-my_data <- read_excel(file.choose())
+# Reading in Data
+my_data <- read.csv('stats_451_final_project/data/original.csv')
 ```
 
 ```{r}
