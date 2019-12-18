@@ -20,21 +20,16 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 ```{r}
 library(tidyverse)
 
-#The variable my_data is a global variable that contains all the records of the Avocado Prices Dataset
+my_data <- read.csv('stats_451_final_project/data/original.csv')
+
 #Summary Statistics for Numeric Variables
 nrow(my_data)
 my_data %>% select_if(is.numeric) %>% summary()
 
-#Standard Deviation for Each Numeric Variable
-sd(my_data$AveragePrice)
-sd(my_data$`Total Volume`)
-sd(my_data$`4046`)
-sd(my_data$`4225`)
-sd(my_data$`4770`)
-sd(my_data$`Total Bags`)
-sd(my_data$`Small Bags`)
-sd(my_data$`Large Bags`)
-sd(my_data$`XLarge Bags`)
+#Selecting Relevant Columns + Calculating Standard Deviation for Each Numeric Variable
+numeric_variables <- my_data %>% select_if(is.numeric) %>% colnames()
+relevant_columns <- my_data %>% select(AveragePrice, `Total Volume`, `4046`, `4225`, `4770`, `Total Bags`, `Small Bags`, `Large Bags`, `XLarge Bags`)
+relevant_columns %>% apply(2, sd)
 
 ```
 ```
