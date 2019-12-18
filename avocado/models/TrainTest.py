@@ -16,20 +16,6 @@ from avocado.utils.data import get_data
 region = 'WestTexNewMexico'
 df, X_train, y_train, X_test, y_test = get_data(region=region)
 
-# print(df)
-
-
-
-#print(df.head())
-#print(df.groupby(df.index.year).describe())
-
-
-# gp_kernel = Kernels.ExpSineSquared(2.0, 6.0, periodicity_bounds=(1e-2, 1e5)) \
-#     + Kernels.WhiteKernel() \
-#     + Kernels.RBF() \
-#     + Kernels.Matern() \
-#     + Kernels.RationalQuadratic() \
-#     + Kernels.WhiteKernel(1e-1)
 
 # periodicity of 358 is 1 year. performs poorly on test
 # Best: 100., 200.
