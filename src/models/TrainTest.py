@@ -134,13 +134,14 @@ print(f'Model: {str(gpr.kernel_)}')
 
 fig, ax = plt.subplots(figsize=(10, 5))
 
-
 plt.scatter(X_train, y_train, c='k', s=10, label='Train')
 plt.scatter(X_test, y_test, c='r', s=10, label='Test')
 plt.plot(X_train, y_gpr_train, color='darkorange', lw=2, label='GP')
 plt.plot(X_test, y_gpr_test, color='darkorange', lw=2)
-plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2)
+plt.fill_between(X_train, CI_lower_bound_train, CI_higher_bound_train, color='blue', alpha=0.2, label='95% PPC interval')
 plt.fill_between(X_test, CI_lower_bound_test, CI_higher_bound_test, color='blue', alpha=0.2)
+plt.fill_between(X_train, y_gpr_train - y_std_train, y_gpr_train + y_std_train, color='blue', alpha=0.4, label='GP stdev')
+plt.fill_between(X_test, y_gpr_test - y_std_test, y_gpr_test + y_std_test, color='blue', alpha=0.4)
 plt.xlabel('Time (Weekly)')
 plt.ylabel('Average Avocado Price (USD)')
 plt.title(f'GPR: {region} Organic Avocado Price')
