@@ -86,8 +86,7 @@ modified_data_1 = filter(my_data, region == c("WestTexNewMexico"), type == "orga
 ```{r}
 #Time Trend in Average Price for Entire Dataset 
 #This is Figure 2 in Final Report
-ggplot(data = my_data, mapping = aes(x = Date, y = AveragePrice)) + geom_point(mapping = aes(color = year)) + geom_smooth() + ggtitle()
-
+ggplot(data = my_data, mapping = aes(x = Date, y = AveragePrice)) + geom_point(mapping = aes(color = year)) + geom_smooth(color = "red") 
 ```
 
 
@@ -120,11 +119,17 @@ print(regional_plot + ggtitle("Avocado Price Range By Region and Type"))
 
 ```{r}
 #Tabulating Differences between Conventional and Organic Data -- For use later in paper
-my_data
+
 organic_data = filter(my_data, type == "organic")
 conventional_data = filter(my_data, type == "conventional")
 mean(organic_data$AveragePrice)
 mean(conventional_data$AveragePrice)
 var(organic_data$AveragePrice)
 var(conventional_data$AveragePrice)
+nrow(organic_data)
+nrow(conventional_data)
+quantile(organic_data$AveragePrice, 0.75)
+quantile(organic_data$AveragePrice, 0.25)
+quantile(conventional_data$AveragePrice, 0.75)
+quantile(conventional_data$AveragePrice, 0.25)
 ```

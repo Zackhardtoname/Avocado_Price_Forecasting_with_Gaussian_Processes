@@ -23,3 +23,5 @@ open the matplotlib plotting environment with the guassian process visualization
 
 If this is not the case, then the plot will be stored as a png file in /figures.
 This folder has many image files, the most recently generated will be at the bottom.
+
+Model performance statistics and hyperparameter selection is printed to stdout.
