@@ -1,5 +1,9 @@
 # STATS 451 - Bayesian Data Analysis - Final Project
 
+Our paper is  Avocado_Price_Forecasting_with_Gaussian_Processes.pdf
+
+To run code:
+
 Run the following commands from the terminal on linux/mac
 
 To setup:
