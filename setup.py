@@ -6,7 +6,7 @@ setup(
     packages=['avocado'],
     include_package_data=True,
     install_requires=[
-        'numpy ==1.16.5',
+        'numpy ==1.22.0',
         'matplotlib==3.1.1',
         'scikit-learn==0.21.3',
         'scipy==1.3.1',
