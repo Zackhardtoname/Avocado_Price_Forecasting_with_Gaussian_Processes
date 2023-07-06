@@ -9,7 +9,7 @@ setup(
         'numpy ==1.16.5',
         'matplotlib==3.1.1',
         'scikit-learn==0.21.3',
-        'scipy==1.3.1',
+        'scipy==1.10.0',
         'pandas==0.25.1',
         'click==7.0',
         'pycodestyle==2.5.0',
